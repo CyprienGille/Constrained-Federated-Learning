@@ -11,23 +11,28 @@ def load_model(path, n_inputs=200):
     try:
         model.load_state_dict(torch.load(path))
     except RuntimeError:
+        # If the model was a projected model, it has a mask buffer
+        # Note: the tensor here assumes a default FCNN
         model.register_buffer(name="mask", tensor=torch.zeros((4, 300, n_inputs)))
         model.load_state_dict(torch.load(path))
     return model
 
 
-def show_matrix(models_list, fig_name):
+def show_matrix(models_list, fig_path):
     fig, axs = plt.subplots(nrows=1, ncols=len(models_list), sharex=True, sharey=True)
     fig.suptitle("First Layer Activations")
 
     images = []
     for i, ax in enumerate(axs.flat):
+        # for each subplot, get the first layer of the model
         model = models_list[i]
         for param in model.parameters():
             matrix = param
             break
+        # Plot the absolute value of the weight matrix
         images.append(ax.imshow(np.abs(matrix.numpy(force=True))))
 
+    # Colorbar unification and normalization
     vmin = min(image.get_array().min() for image in images)
     vmax = max(image.get_array().max() for image in images)
     norm = colors.Normalize(vmin=vmin, vmax=vmax)
@@ -38,7 +43,8 @@ def show_matrix(models_list, fig_name):
 
     plt.xlabel("Features")
     plt.ylabel("Neurons")
-    plt.savefig(fig_name, dpi=400, facecolor="white", bbox_inches="tight")
+    plt.savefig(fig_path, dpi=400, facecolor="white", bbox_inches="tight")
+    # plt.show()
     plt.close()
 
 
@@ -48,5 +54,5 @@ if __name__ == "__main__":
     model_2 = load_model("model_2.pth")
     model_2_proj = load_model("model_2_proj.pth")
 
-    show_matrix([model_1, model_2], fig_name="plots/2cohorts.png")
-    show_matrix([model_1_proj, model_2_proj], fig_name="plots/2cohorts_proj.png")
+    show_matrix([model_1, model_2], fig_path="plots/2cohorts.png")
+    show_matrix([model_1_proj, model_2_proj], fig_path="plots/2cohorts_proj.png")
