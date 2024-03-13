@@ -1,3 +1,4 @@
+from typing import Optional, List
 from numpy import arange
 from sklearn.datasets import make_classification
 from sklearn.model_selection import train_test_split
@@ -18,15 +19,15 @@ class ArtificialDataset(Dataset):
 
 
 def get_train_test_data(
-    train_prop,
-    n_samples,
-    n_features,
-    n_informative,
-    n_redundant,
-    n_repeated,
-    n_clusters_per_class,
-    weights,
-    class_sep,
+    train_prop: float,
+    n_samples: int,
+    n_features: int,
+    n_informative: int,
+    n_redundant: int,
+    n_repeated: int,
+    n_clusters_per_class: int,
+    weights: Optional[List[float]],
+    class_sep: float,
 ):
     X, y = make_classification(
         n_samples=n_samples,
@@ -43,10 +44,12 @@ def get_train_test_data(
         scale=1.0,
     )
 
+    # Split into two cohorts
     idx_1, idx_2 = train_test_split(arange(n_samples), train_size=0.5)
     X_1, X_2 = X[idx_1], X[idx_2]
     y_1, y_2 = y[idx_1], y[idx_2]
 
+    # Then split into training and testing sets
     train_idx_1, test_idx_1 = train_test_split(arange(len(y_1)), train_size=train_prop)
     X_train_1, X_test_1 = X_1[train_idx_1], X_1[test_idx_1]
     y_train_1, y_test_1 = y_1[train_idx_1], y_1[test_idx_1]

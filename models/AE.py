@@ -16,6 +16,6 @@ class netBio(nn.Module):
         )
 
     def forward(self, x):
-        encode = self.encoder(x)
-        decode = self.decoder(encode)
-        return encode, decode
+        encoded = self.encoder(x)
+        decoded = self.decoder(encoded)
+        return encoded, decoded

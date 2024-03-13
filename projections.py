@@ -68,7 +68,7 @@ def proj_l1inf_numpy(Y, c, tol=1e-5, direction="row"):
     return X
 
 
-def proj_l1infball(w0, eta, device="cpu"):
+def proj_l1infball(w0, eta: float, device="cpu"):
     shape = w0.shape
     w = w0.numpy(force=True)
     res = proj_l1inf_numpy(w, eta, direction="col")
