@@ -41,7 +41,7 @@ RESULTS_DIR = "results/"
 MODEL_TYPE = FCNN
 # MODEL_TYPE = netBio
 
-## Note: if you modify the input data, make sure to check that N_FEATURES and feature_axis are correct!
+## !Note: if you modify the input data, make sure to check that N_FEATURES and feature_axis are correct!
 data_path = "data/Synth_300f_20inf_10000s.csv"
 # data_path = "data/GC_Breast_D_MB.csv"
 # data_path = "data/LUNG.csv"
