@@ -19,6 +19,7 @@ class ArtificialDataset(Dataset):
             # If there is no Name column, no need to do anything
             pass
 
+        # Make sure that the index is akin to list(range(self.__len__()))
         self.X.reset_index(inplace=True, drop=True)
 
         self.y = df["Label"]
@@ -150,8 +151,10 @@ def prog(iterable: Iterable, verbose=False):
 
 
 def get_feature_weights(model: torch.nn.Module, test_dl: DataLoader, device="cpu"):
+    # Suppress captum UserWarning
     warnings.filterwarnings(action="ignore", category=UserWarning)
 
+    # Create dataloader to get all of the test data in one chunk
     dl = DataLoader(test_dl.dataset, batch_size=len(test_dl.dataset), shuffle=False)
 
     for x, _ in dl:
@@ -160,6 +163,7 @@ def get_feature_weights(model: torch.nn.Module, test_dl: DataLoader, device="cpu
     if isinstance(model, FCNN):
         deepl = DeepLift(model)
     elif isinstance(model, netBio):
+        # We only care about which features are used for classification
         deepl = DeepLift(model.encoder)
     else:
         raise NotImplementedError("This model class is not implemented.")
@@ -169,8 +173,10 @@ def get_feature_weights(model: torch.nn.Module, test_dl: DataLoader, device="cpu
     weights /= weights.max()  # Normalize to have weights descending from 1
 
     return (
-        weights.numpy(force=True),
-        dl.dataset.X.columns[indexes.numpy(force=True)].to_list(),
+        weights.numpy(force=True),  # Feature weights, ranked
+        dl.dataset.X.columns[
+            indexes.numpy(force=True)
+        ].to_list(),  # feature names, in order
     )
 
 

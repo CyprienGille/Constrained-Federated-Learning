@@ -31,8 +31,8 @@ PROJECTION = bilevel_proj_l1Inftyball
 ETA = 0.1
 N_COHORTS = 2
 LOSS_LAMBDA = 0.0005
-N_FOLDS = 4
-VERBOSE = True
+N_FOLDS = 4  # For cross-validation
+VERBOSE = True  # To get print statements indicating the steps
 PROGRESS_BARS = False
 LABELS_COLUMN_NAME = "Label"
 MODELS_DIR = "saved_models/"
@@ -110,6 +110,7 @@ def double_descent(
     if verbose:
         # !! Note: this density formula assumes that we're only projecting the first layer
         # and that this layer has 300 hidden neurons
+        # (which is true for the default FCNN)
         print(
             f"==Second Descent==\n(Density : {torch.sum(torch.flatten(masks[0]))/(N_FEATURES*300):.4f})"
         )
@@ -179,6 +180,7 @@ def compute_metrics(model: torch.nn.Module, test_dl: DataLoader, verbose=False):
 
 
 if __name__ == "__main__":
+    # Make the subdirectories to save the models and results
     MODELS_DIR += data_path[5:-4] + "/"
     RESULTS_DIR += data_path[5:-4] + "/"
     if not os.path.exists(MODELS_DIR):
@@ -202,6 +204,7 @@ if __name__ == "__main__":
         if VERBOSE:
             print(f"\n====Cohort {cohort_i+1}/{N_COHORTS}====")
 
+        # Prepare the result and feature rank dataframes
         results_df = pd.DataFrame(
             index=[f"Fold {i}" for i in range(N_FOLDS)] + ["Mean", "Std"],
             columns=["Test Accuracy"],
@@ -219,7 +222,7 @@ if __name__ == "__main__":
             index=get_features_from_df(df),
         )
 
-        kf = KFold(n_splits=N_FOLDS)
+        kf = KFold(n_splits=N_FOLDS)  # Cross validation
         for fold_i, (train_idx, test_idx) in enumerate(kf.split(df_cohort.index)):
             if VERBOSE:
                 print(f"===Fold {fold_i+1}/{N_FOLDS}===")
@@ -252,6 +255,7 @@ if __name__ == "__main__":
                 last_model_proj, test_dl, device=DEVICE
             )
 
+            # Fill the DataFrames
             results_df.at[f"Fold {fold_i}", "Test Accuracy"] = acc
             results_df_proj.at[f"Fold {fold_i}", "Test Accuracy"] = acc_proj
 
@@ -282,6 +286,8 @@ if __name__ == "__main__":
         features_df_proj["Std"] = features_df_proj[
             [f"Fold {i}" for i in range(N_FOLDS)]
         ].std(axis=1)
+
+        # Sort the feature rankings
         features_df.sort_values(by="Mean", ascending=False, inplace=True)
         features_df_proj.sort_values(by="Mean", ascending=False, inplace=True)
 
