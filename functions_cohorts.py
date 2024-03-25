@@ -1,6 +1,7 @@
 from captum.attr import DeepLift
 from models.FCNN import FCNN
 from models.AE import netBio
+import numpy as np
 from pandas import DataFrame
 import torch
 from torch.utils.data import Dataset, DataLoader
@@ -10,7 +11,7 @@ import warnings
 
 
 class ArtificialDataset(Dataset):
-    def __init__(self, df: DataFrame):
+    def __init__(self, df: DataFrame, do_log=False, do_scale=False):
         super().__init__()
         self.X = df.drop(labels=["Label"], axis=1)
         try:
@@ -25,10 +26,15 @@ class ArtificialDataset(Dataset):
         self.y = df["Label"]
         self.y.reset_index(inplace=True, drop=True)
 
+        if do_log:
+            self.X = df.map(lambda x: np.log(np.abs(x + 1)))
+        if do_scale:
+            self.X = (self.X - self.X.mean(axis=0)) / self.X.std(axis=0)
+
     def __getitem__(self, index: int):
-        return torch.tensor(self.X.iloc[index], dtype=torch.float32), torch.tensor(
-            self.y.iloc[index]
-        )
+        return torch.tensor(
+            self.X.iloc[index].values, dtype=torch.float32
+        ), torch.tensor(self.y.iloc[index])
 
     def __len__(self) -> int:
         return len(self.y)

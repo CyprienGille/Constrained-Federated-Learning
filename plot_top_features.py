@@ -14,7 +14,7 @@ data_path = "data/Synth_300f_20inf_10000s.csv"
 # data_path = "data/GC_Breast_D_MB.csv"
 # data_path = "data/LUNG.csv"
 
-N_FEATURES_TO_PLOT = 40  # Where to cut off the plot
+N_FEATURES_TO_PLOT = 50  # Where to cut off the plot
 SORT_BY_NO_PROJ = False  # Whether to sort the features with the order from cohort 0, no proj or from cohort 0, proj
 
 

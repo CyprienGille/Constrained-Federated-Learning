@@ -21,14 +21,11 @@ from functions_cohorts import (
 from cohort_splitting import split_into_chunks
 
 ## Params
-N_FEATURES = 300
-# N_FEATURES = 162  # Breast
-# N_FEATURES = 2944  # LUNG
 N_EPOCHS = 20
 BATCH_SIZE = 32
 LR = 1e-4
 PROJECTION = bilevel_proj_l1Inftyball
-ETA = 0.1
+ETA = 0.05
 N_COHORTS = 2
 LOSS_LAMBDA = 0.0005
 N_FOLDS = 4  # For cross-validation
@@ -42,13 +39,16 @@ MODEL_TYPE = FCNN
 # MODEL_TYPE = netBio
 
 ## !Note: if you modify the input data, make sure to check that N_FEATURES and feature_axis are correct!
-data_path = "data/Synth_300f_20inf_10000s.csv"
+# data_path = "data/Synth_300f_20inf_10000s.csv"
 # data_path = "data/GC_Breast_D_MB.csv"
-# data_path = "data/LUNG.csv"
+data_path = "data/LUNG.csv"
 
 # 0 if the features are along the columns (e.g. for synthetic data)
 # 1 if the features are along the rows (e.g. for Breast or LUNG)
-feature_axis = 0
+feature_axis = 1
+
+DO_LOG = True  # Log-transform the data
+DO_SCALE = True  # Normalize the data (zero mean, unit variance)
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -200,6 +200,8 @@ if __name__ == "__main__":
     else:
         raise ValueError(f"feature_axis needs to be 0 or 1, got {feature_axis}")
 
+    N_FEATURES = len(df.columns)
+
     for cohort_i, df_cohort in enumerate(split_into_chunks(df, N_COHORTS)):
         if VERBOSE:
             print(f"\n====Cohort {cohort_i+1}/{N_COHORTS}====")
@@ -230,8 +232,8 @@ if __name__ == "__main__":
             test_df = df_cohort.iloc[test_idx].copy()
 
             try:
-                train_ds = ArtificialDataset(train_df)
-                test_ds = ArtificialDataset(test_df)
+                train_ds = ArtificialDataset(train_df, DO_LOG, DO_SCALE)
+                test_ds = ArtificialDataset(test_df, DO_LOG, DO_SCALE)
             except KeyError:
                 raise KeyError(
                     "'Name' and/or 'Label' column(s) not found. Make sure that your data contains these rows/columns and that the value of feature_axis is correct."
