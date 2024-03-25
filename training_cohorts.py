@@ -47,8 +47,8 @@ data_path = "data/Synth_300f_20inf_10000s.csv"
 # 1 if the features are along the rows (e.g. for Breast or LUNG)
 feature_axis = 0
 
-DO_LOG = True  # Log-transform the data
-DO_SCALE = True  # Normalize the data (zero mean, unit variance)
+DO_LOG = False  # Log-transform the data
+DO_SCALE = False  # Normalize the data (zero mean, unit variance)
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
