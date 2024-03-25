@@ -25,7 +25,7 @@ N_EPOCHS = 20
 BATCH_SIZE = 32
 LR = 1e-4
 PROJECTION = bilevel_proj_l1Inftyball
-ETA = 0.05
+ETA = 0.1
 N_COHORTS = 2
 LOSS_LAMBDA = 0.0005
 N_FOLDS = 4  # For cross-validation
@@ -39,13 +39,13 @@ MODEL_TYPE = FCNN
 # MODEL_TYPE = netBio
 
 ## !Note: if you modify the input data, make sure to check that N_FEATURES and feature_axis are correct!
-# data_path = "data/Synth_300f_20inf_10000s.csv"
+data_path = "data/Synth_300f_20inf_10000s.csv"
 # data_path = "data/GC_Breast_D_MB.csv"
-data_path = "data/LUNG.csv"
+# data_path = "data/LUNG.csv"
 
 # 0 if the features are along the columns (e.g. for synthetic data)
 # 1 if the features are along the rows (e.g. for Breast or LUNG)
-feature_axis = 1
+feature_axis = 0
 
 DO_LOG = True  # Log-transform the data
 DO_SCALE = True  # Normalize the data (zero mean, unit variance)
