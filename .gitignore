@@ -3,3 +3,4 @@ saved_models/
 temp/
 results/
 data/LUNG.csv
+test.py
